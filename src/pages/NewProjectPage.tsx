@@ -1,17 +1,27 @@
+import { useMutation } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
 import FormField from '@/components/FormField'
 import PageHeader from '@/components/PageHeader'
 import { Button } from '@/components/ui/button'
-import { useNavigate } from 'react-router-dom'
 import {
   projectSchema,
   type ProjectFormData,
 } from '@/features/project/projectSchema'
+import { createProject } from '@/services/projectApi'
 
 function NewProjectPage() {
   const navigate = useNavigate()
+
+  const createProjectMutation = useMutation({
+    mutationFn: createProject,
+    onSuccess: (response) => {
+      navigate(`/projects/${response.project.id}`)
+    },
+  })
+
   const {
     register,
     handleSubmit,
@@ -20,11 +30,9 @@ function NewProjectPage() {
     resolver: zodResolver(projectSchema),
   })
 
-function onSubmit(data: ProjectFormData) {
-  console.log('Project form submitted:', data)
-
-  navigate('/projects/mock-project-1')
-}
+  function onSubmit(data: ProjectFormData) {
+    createProjectMutation.mutate(data)
+  }
 
   return (
     <div className="space-y-8">
@@ -89,8 +97,19 @@ function onSubmit(data: ProjectFormData) {
           />
         </FormField>
 
-        <Button type="submit">
-          Generate Mock PRD
+        {createProjectMutation.isError && (
+          <p className="text-sm text-destructive">
+            Project could not be created. Please try again.
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          disabled={createProjectMutation.isPending}
+        >
+          {createProjectMutation.isPending
+            ? 'Creating...'
+            : 'Generate Mock PRD'}
         </Button>
       </form>
     </div>

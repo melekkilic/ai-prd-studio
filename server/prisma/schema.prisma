@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id             String   @id @default(uuid())
+  name           String
+  productIdea    String
+  targetAudience String
+  primaryGoal    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  prd            Prd?
+}
+
+model Prd {
+  id                        String   @id @default(uuid())
+  summary                   String
+  problemStatement          String
+  targetUsers               Json
+  goals                     Json
+  nonGoals                  Json
+  userStories               Json
+  functionalRequirements    Json
+  nonFunctionalRequirements Json
+  acceptanceCriteria        Json
+  risks                     Json
+  openQuestions             Json
+
+  projectId                 String   @unique
+  project                   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+}

@@ -1,39 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 
 import Section from '@/components/Section'
 import WorkspaceSidebar from '@/components/WorkspaceSidebar'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { Project } from '@/features/project/types'
+import { projectQueryKeys } from '@/features/project/projectQueryKeys'
 import { getProjectById } from '@/services/prdService'
 
 function ProjectWorkspacePage() {
   const { id } = useParams()
 
-  const [project, setProject] = useState<Project | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    data: project,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: projectQueryKeys.detail(id!),
+    queryFn: () => getProjectById(id!),
+    enabled: !!id,
+  })
 
-  useEffect(() => {
-    async function loadProject() {
-      if (!id) {
-        setError('Project id is missing')
-        setIsLoading(false)
-        return
-      }
-
-      try {
-        const data = await getProjectById(id)
-        setProject(data)
-      } catch {
-        setError('Project could not be loaded')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadProject()
-  }, [id])
+  if (!id) {
+    return (
+      <p className="text-destructive">
+        Project id is missing
+      </p>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -45,10 +39,19 @@ function ProjectWorkspacePage() {
     )
   }
 
-  if (error || !project) {
+  if (isError) {
+    const message =
+      error instanceof Error && error.message === 'PROJECT_NOT_FOUND'
+        ? 'Project not found'
+        : 'Project could not be loaded'
+
+    return <p className="text-destructive">{message}</p>
+  }
+
+  if (!project) {
     return (
       <p className="text-destructive">
-        {error ?? 'Project not found'}
+        Project not found
       </p>
     )
   }

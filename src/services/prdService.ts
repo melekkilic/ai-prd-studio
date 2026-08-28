@@ -1,12 +1,20 @@
-import { mockProject } from '@/features/project/mockProject'
 import type { Project } from '@/features/project/types'
 
+type ProjectApiResponse = {
+  project: Project
+}
 export async function getProjectById(id: string): Promise<Project> {
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  const response = await fetch(`http://localhost:3001/api/projects/${id}`)
 
-  if (id !== mockProject.id) {
-    throw new Error('Project not found')
+  if (response.status === 404) {
+    throw new Error('PROJECT_NOT_FOUND')
   }
 
-  return mockProject
+  if (!response.ok) {
+    throw new Error('PROJECT_LOAD_FAILED')
+  }
+
+  const data: ProjectApiResponse = await response.json()
+
+  return data.project
 }
