@@ -233,3 +233,50 @@ The current version supports the complete flow from product idea input to AI-gen
 ## License
 
 This project is currently intended for learning, portfolio, and development purposes.
+
+## Current Version
+
+**V1 — AI-powered PRD Generation**
+
+The first version of AI PRD Studio focuses on the core workflow:
+
+Product Idea → AI-generated PRD → Validation → Persistence → Project Workspace
+
+V1 is a functional MVP and the project will continue to evolve with additional product analysis and documentation capabilities.
+
+## Roadmap / To-Do
+
+Planned improvements for future versions:
+
+- [ ] Generate visual diagrams from project requirements
+  - BPMN process diagrams
+  - Data Flow Diagrams (DFD)
+  - User flow diagrams
+
+- [ ] Allow users to edit AI-generated PRD sections
+
+- [ ] Regenerate individual PRD sections instead of the entire document
+
+- [ ] Add PRD version history and change tracking
+
+- [ ] Export PRDs as PDF / Markdown
+
+- [ ] Add project search and filtering
+
+- [ ] Add authentication and user workspaces
+
+- [ ] Add AI-assisted requirement refinement
+
+- [ ] Detect ambiguous or missing requirements and suggest clarification questions
+
+- [ ] Generate additional Business Analysis artifacts
+  - Business Rules
+  - Use Cases
+  - Acceptance Criteria
+  - Stakeholder Analysis
+
+- [ ] Improve responsive/mobile experience
+
+- [ ] Add automated frontend and backend tests
+
+- [ ] Deploy the application for public access
