@@ -2,10 +2,16 @@ import type { Request, Response } from 'express'
 
 import {
   createProject,
+  deleteProjectById,
   getProjectById,
   getProjects,
 } from '../services/projectService.js'
 import type { CreateProjectRequest } from '../types/project.js'
+import type { PrdResponse } from '../types/prd.js'
+
+type CreateProjectBody = CreateProjectRequest & {
+  prd: PrdResponse
+}
 
 export async function getAllProjects(_req: Request, res: Response) {
   const projects = await getProjects()
@@ -16,21 +22,25 @@ export async function getAllProjects(_req: Request, res: Response) {
 }
 
 export async function createNewProject(req: Request, res: Response) {
-  const data = req.body as CreateProjectRequest
+  const body = req.body as CreateProjectBody
 
   if (
-    !data.name ||
-    !data.productIdea ||
-    !data.targetAudience ||
-    !data.primaryGoal
+    !body.name?.trim() ||
+    !body.productIdea?.trim() ||
+    !body.targetAudience?.trim() ||
+    !body.primaryGoal?.trim() ||
+    !body.prd
   ) {
     res.status(400).json({
-      message: 'All project fields are required',
+      code: 'VALIDATION_ERROR',
+      message: 'Project fields and PRD are required',
     })
     return
   }
 
-  const project = await createProject(data)
+  const { prd, ...projectData } = body
+
+  const project = await createProject(projectData, prd)
 
   res.status(201).json({
     project,
@@ -42,6 +52,7 @@ export async function getProject(req: Request, res: Response) {
 
   if (typeof id !== 'string') {
     res.status(400).json({
+      code: 'INVALID_PROJECT_ID',
       message: 'Invalid project id',
     })
     return
@@ -51,6 +62,7 @@ export async function getProject(req: Request, res: Response) {
 
   if (!project) {
     res.status(404).json({
+      code: 'PROJECT_NOT_FOUND',
       message: 'Project not found',
     })
     return
@@ -59,4 +71,27 @@ export async function getProject(req: Request, res: Response) {
   res.json({
     project,
   })
+}
+
+export async function deleteProject(req: Request, res: Response) {
+  const id = req.params.id
+
+  if (typeof id !== 'string') {
+    res.status(400).json({
+      code: 'INVALID_PROJECT_ID',
+      message: 'Invalid project id',
+    })
+    return
+  }
+
+  try {
+    await deleteProjectById(id)
+
+    res.status(204).send()
+  } catch {
+    res.status(404).json({
+      code: 'PROJECT_NOT_FOUND',
+      message: 'Project not found',
+    })
+  }
 }

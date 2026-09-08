@@ -1,14 +1,20 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import EmptyState from '@/components/EmptyState'
 import PageHeader from '@/components/PageHeader'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { projectQueryKeys } from '@/features/project/projectQueryKeys'
-import { getProjects } from '@/services/projectApi'
+import {
+  deleteProject,
+  getProjects,
+} from '@/services/projectApi'
 
 function ProjectsPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const {
     data: projects,
@@ -18,6 +24,33 @@ function ProjectsPage() {
     queryKey: projectQueryKeys.all,
     queryFn: getProjects,
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteProject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: projectQueryKeys.all,
+      })
+    },
+  })
+
+  function handleDelete(
+    event: React.MouseEvent,
+    id: string,
+    projectName: string,
+  ) {
+    event.stopPropagation()
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${projectName}"?`,
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    deleteMutation.mutate(id)
+  }
 
   if (isLoading) {
     return (
@@ -55,26 +88,58 @@ function ProjectsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
-          <button
+          <div
             key={project.id}
-            type="button"
+            role="button"
+            tabIndex={0}
             onClick={() => navigate(`/projects/${project.id}`)}
-            className="rounded-lg border p-5 text-left transition hover:bg-muted"
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                navigate(`/projects/${project.id}`)
+              }
+            }}
+            className="group relative cursor-pointer rounded-lg border p-5 text-left transition hover:bg-muted"
           >
-            <h2 className="font-semibold">
-              {project.name}
-            </h2>
+            <div className="pr-10">
+              <h2 className="font-semibold">
+                {project.name}
+              </h2>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              {project.productIdea}
-            </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {project.productIdea}
+              </p>
 
-            <p className="mt-4 text-xs text-muted-foreground">
-              {project.targetAudience}
-            </p>
-          </button>
+              <p className="mt-4 text-xs text-muted-foreground">
+                {project.targetAudience}
+              </p>
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-3 top-3 opacity-70 transition hover:text-destructive group-hover:opacity-100"
+              disabled={deleteMutation.isPending}
+              onClick={(event) =>
+                handleDelete(
+                  event,
+                  project.id,
+                  project.name,
+                )
+              }
+              aria-label={`Delete ${project.name}`}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         ))}
       </div>
+
+      {deleteMutation.isError && (
+        <p className="text-sm text-destructive">
+          Project could not be deleted. Please try again.
+        </p>
+      )}
     </div>
   )
 }

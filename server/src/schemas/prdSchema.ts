@@ -1,17 +1,23 @@
 import { z } from 'zod'
 
+const nonEmptyString = z.string().trim().min(1)
+
 export const prdSchema = z.object({
-  summary: z.string(),
-  problemStatement: z.string(),
-  targetUsers: z.array(z.string()),
-  goals: z.array(z.string()),
-  nonGoals: z.array(z.string()),
-  userStories: z.array(z.string()),
-  functionalRequirements: z.array(z.string()),
-  nonFunctionalRequirements: z.array(z.string()),
-  acceptanceCriteria: z.array(z.string()),
-  risks: z.array(z.string()),
-  openQuestions: z.array(z.string()),
+  summary: nonEmptyString,
+  problemStatement: nonEmptyString,
+
+  targetUsers: z.array(nonEmptyString).min(1),
+  goals: z.array(nonEmptyString).min(1),
+
+  nonGoals: z.array(nonEmptyString),
+
+  userStories: z.array(nonEmptyString).min(1),
+  functionalRequirements: z.array(nonEmptyString).min(1),
+  nonFunctionalRequirements: z.array(nonEmptyString).min(1),
+  acceptanceCriteria: z.array(nonEmptyString).min(1),
+
+  risks: z.array(nonEmptyString),
+  openQuestions: z.array(nonEmptyString),
 })
 
 export const prdJsonSchema = {

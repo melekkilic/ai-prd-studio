@@ -1,3 +1,4 @@
+import type { Prd } from '@/features/prd/types'
 import type { ProjectFormData } from '@/features/project/projectSchema'
 import type { Project } from '@/features/project/types'
 
@@ -9,10 +10,14 @@ type ProjectsApiResponse = {
   projects: Project[]
 }
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3001'
+
 export async function createProject(
   data: ProjectFormData,
+  prd: Prd,
 ): Promise<CreateProjectResponse> {
-  const response = await fetch('http://localhost:3001/api/projects', {
+  const response = await fetch(`${API_BASE_URL}/api/projects`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -22,6 +27,7 @@ export async function createProject(
       productIdea: data.productIdea,
       targetAudience: data.targetAudience,
       primaryGoal: data.primaryGoal,
+      prd,
     }),
   })
 
@@ -33,7 +39,7 @@ export async function createProject(
 }
 
 export async function getProjects(): Promise<Project[]> {
-  const response = await fetch('http://localhost:3001/api/projects')
+  const response = await fetch(`${API_BASE_URL}/api/projects`)
 
   if (!response.ok) {
     throw new Error('Projects could not be loaded')
@@ -42,4 +48,14 @@ export async function getProjects(): Promise<Project[]> {
   const data: ProjectsApiResponse = await response.json()
 
   return data.projects
+}
+
+export async function deleteProject(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${id}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    throw new Error('Project could not be deleted')
+  }
 }

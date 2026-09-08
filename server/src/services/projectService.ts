@@ -1,18 +1,21 @@
 import type { CreateProjectRequest } from '../types/project.js'
+import type { PrdResponse } from '../types/prd.js'
 
-import { mockPrd } from '../data/mockPrd.js'
 import { prisma } from '../lib/prisma.js'
 
 export async function getProjects() {
   return prisma.project.findMany()
 }
 
-export async function createProject(data: CreateProjectRequest) {
+export async function createProject(
+  data: CreateProjectRequest,
+  prd: PrdResponse,
+) {
   return prisma.project.create({
     data: {
       ...data,
       prd: {
-        create: mockPrd,
+        create: prd,
       },
     },
     include: {
@@ -28,6 +31,14 @@ export async function getProjectById(id: string) {
     },
     include: {
       prd: true,
+    },
+  })
+}
+
+export async function deleteProjectById(id: string) {
+  return prisma.project.delete({
+    where: {
+      id,
     },
   })
 }

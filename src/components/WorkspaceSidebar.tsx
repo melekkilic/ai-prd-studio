@@ -1,17 +1,33 @@
-import { Link, useParams } from 'react-router-dom'
+const sections = [
+  { label: 'Overview', id: 'overview' },
+  { label: 'Problem', id: 'problem' },
+  { label: 'Target Users', id: 'target-users' },
+  { label: 'Goals', id: 'goals' },
+  { label: 'User Stories', id: 'user-stories' },
+  { label: 'Requirements', id: 'requirements' },
+]
 
 function WorkspaceSidebar() {
-  const { id } = useParams()
+  function scrollToSection(id: string) {
+    document.getElementById(id)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   return (
-    <aside className="w-64 border-r p-4">
-      <nav className="flex flex-col gap-2">
-        <Link to={`/projects/${id}`}>Overview</Link>
-        <Link to={`/projects/${id}`}>Problem</Link>
-        <Link to={`/projects/${id}`}>Target Users</Link>
-        <Link to={`/projects/${id}`}>Goals</Link>
-        <Link to={`/projects/${id}`}>User Stories</Link>
-        <Link to={`/projects/${id}`}>Requirements</Link>
+    <aside className="sticky top-24 h-fit w-56 shrink-0 border-r pr-6">
+      <nav className="space-y-1">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            onClick={() => scrollToSection(section.id)}
+            className="block w-full rounded-md px-3 py-2 text-left text-sm transition hover:bg-muted"
+          >
+            {section.label}
+          </button>
+        ))}
       </nav>
     </aside>
   )
