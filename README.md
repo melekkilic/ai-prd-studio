@@ -4,6 +4,25 @@ AI PRD Studio is a full-stack application that turns a rough product idea into a
 
 Users can create a product project, generate an AI-powered PRD, persist the project and generated PRD in PostgreSQL, and view the result in a dedicated workspace.
 
+
+## Screenshots
+
+### Landing Page
+
+![AI PRD Studio Landing Page](screenshots/landing.png)
+
+### AI-Generated PRD Workspace
+
+![AI PRD Studio Workspace](screenshots/workspace.png)
+
+### Create a New Project
+
+![Create Project](screenshots/create-project.png)
+
+### Project Management
+
+![Projects](screenshots/projects.png)
+
 ## Tech Stack
 
 ### Frontend
